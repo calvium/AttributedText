@@ -68,7 +68,15 @@
         guard let attributedText = self.attributedText else { return nil }
 
         let index = indexOfCharacter(at: location)
-        return attributedText.attribute(.link, at: index, effectiveRange: nil) as? URL
+        
+        // BC 7-2-2023 support both URL and string values for the .link attribute
+        let data:Any = attributedText.attribute(.link, at: index, effectiveRange: nil) as Any
+        if let urlString = data as? String {
+            return URL(string:urlString)
+        } else if let urlObject = data as? URL {
+            return urlObject
+        }
+        return nil
       }
 
       private func indexOfCharacter(at location: CGPoint) -> Int {
